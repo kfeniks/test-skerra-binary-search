@@ -1,38 +1,65 @@
 <?php
 /**
- * @version 1.0.0
+ * @version 2.0.0
  * @access public
  */
 
 declare(strict_types=1);
 
 /**
- * Recursive binary search algorithm
+ * There is a known algorithm for finding an element in a sorted array called binary (binary) search.
+ * Its essence lies in dividing the array into halves and comparing the desired element with the element
+ * that is located in the middle of the newly obtained segment.
+ *
+ * Non-recursive binary search algorithm
  * @param array $arrayData
- * @param int $number
- * @param int $lowerPosition
- * @param int $highPosition
- * @return int
+ * @param int $searchValue
+ * @return bool|int
  */
-function methodBinarySearchRecursion(array &$arrayData, int $number, int $lowerPosition, int $highPosition): int
+function methodBinarySearch(array $arrayData, int $searchValue): bool|int
 {
-    /** Using the midpoint of the interval as a benchmark for comparison */
-    $middle = intval(($lowerPosition + $highPosition) / 2);
-    /** Exit if the lowest point is greater than the highest point */
-    if ($lowerPosition > $highPosition) {
-        return -1;
-    }
-    if ($number > $arrayData[$middle]) {
-        /** The search number is greater than the checkpoint, discard the left one and continue the search */
-        return methodBinarySearchRecursion($arrayData, $number, $middle + 1, $highPosition);
-    } elseif ($number < $arrayData[$middle]) {
-        /** The search number is less than the breakpoint, discard the right side to continue searching */
-        return methodBinarySearchRecursion($arrayData, $number, $lowerPosition, $middle - 1);
+    $count = count($arrayData);
+    /** Here we check the length of the array to protect against buffer overflows. */
+    if($count < pow(2, 31)) {
+        $start = 0;
+        $end = $count - 1;
+    
+        while(true) {
+            $len = $end - $start;
+            if($len > 2) {
+                if($len % 2 != 0) $len++;
+                $mid = (int) ($len/2 + $start);
+            } elseif ($len >= 0){
+                $mid = $start;
+            } else {
+                return false;
+            }
+    
+            if($arrayData[$mid] == $searchValue) {
+                /**
+                 * If in our original array the value we need occurs several times,
+                 * then using this code we will get the first occurrence of the desired value in the array.
+                 */
+                while( ($mid != 0) && ($arrayData[$mid - 1] == $searchValue)) {
+                    $mid--;
+                }
+    
+                return $mid;
+            } elseif($arrayData[$mid] > $searchValue){
+                $end = $mid - 1;
+            } else {
+                $start = $mid + 1;
+            }
+        }
     } else {
-        return $middle;
+        return false;
     }
 }
 
-$arr = [4, 1, 452, 999, 11, 23, 63, 8743];
-$findKeyRecur = methodBinarySearchRecursion($arr, 63, 0, count($arr));
-print_r($findKeyRecur);
+$array = array(8,89,11,2,56,908,23);
+sort($array);
+$result = methodBinarySearch($array, 908);
+if(false !== $result){
+    var_dump("Result id:" . $result);
+    var_dump("Result value:" . $array[$result]);
+}

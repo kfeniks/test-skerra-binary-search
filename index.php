@@ -50,6 +50,7 @@ function methodBinarySearch(array $arrayData, int $number): int
 }
 
 $arr = [1, 2, 13, 9, 444, 57, 31, 790];
+sort($arr);
 /** Find location 9 non-recursively */
 $findKey = methodBinarySearch($arr, 9);
 print_r($findKey);
